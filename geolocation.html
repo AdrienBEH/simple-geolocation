@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>3WEB</title>
+
+        <!-- API KEY : AIzaSyDKdW-uS9Te9Lgmg4OxxMHvK4yMXvZNZHk -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKdW-uS9Te9Lgmg4OxxMHvK4yMXvZNZHk&callback=initMap" type="text/javascript"></script>
+
+        <link rel="stylesheet" href="https://www.w3.org/TR/2017/NOTE-wai-aria-practices-1.1-20171214/examples/combobox/aria1.0pattern/css/combobox-1.0.css">
+        <link rel="stylesheet" href="https://www.w3.org/TR/2017/NOTE-wai-aria-practices-1.1-20171214/examples/combobox/aria1.0pattern/css/listbox.css">
+        <script src="https://www.w3.org/TR/2017/NOTE-wai-aria-practices-1.1-20171214/examples/combobox/aria1.0pattern/js/combobox-1.0-list.js"></script>
+        <script src="https://www.w3.org/TR/2017/NOTE-wai-aria-practices-1.1-20171214/examples/combobox/aria1.0pattern/js/listbox.js"></script>
+        <script src="https://www.w3.org/TR/2017/NOTE-wai-aria-practices-1.1-20171214/examples/combobox/aria1.0pattern/js/listboxOption.js"></script>
+
+        <style>
+            #map {
+            height: 400px;
+            width: 100%;
+            }
+            [role="listbox"] {
+                z-index: 1000;
+            }
+            [aria-expanded="false"] + button::after {
+                content: "+";
+            }
+            [aria-expanded="true"] + button::after {
+                content: "-";
+            }
+        </style>
+    </head>
+    <body>
+        <button type="button" id="mylocationbtn">Where I am ?</button>
+        <span id="geolocation"></span>
+
+        <div class="combobox-list">
+            <label for="cb1-input">State</label>
+            <div class="group">
+                <input id="cb1-input" class="cb_edit" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-haspopup="true" aria-owns="cb1-listbox" placeholder="Go to...">
+                <button id="cb1-button" tabindex="-1" aria-label="Open"></button>
+            </div>
+            <ul id="cb1-listbox" role="listbox" aria-label="States">
+                <li id="lb1-ak" role="option" class="state" data-lat="48.8737917" data-lng="2.2928388">Arc de triomphe</li>
+                <li id="lb1-as" role="option" class="state" data-lat="48.8602675" data-lng="2.3361373">Le Louvre</li>
+                <li id="lb1-az" role="option" class="state" data-lat="48.8646932" data-lng="2.3197743">La Concorde</li>
+            </ul>
+        </div>
+
+        <div id="map"></div>
+
+        <script>
+            var mygeolocation = document.getElementById("geolocation");
+            var mylocationbtn = document.getElementById("mylocationbtn");
+            var dropbtn = document.getElementById("dropbtn");
+            var droplist = document.getElementById("droplist");
+            var map, marker;
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const container = this.getElementById("cb1-listbox");
+                const elements = container.getElementsByClassName('state');
+
+                for (element of elements) {
+                    element.addEventListener("click", (elmnt) => { setPosition({
+                        lat: Number(elmnt.target.dataset.lat),
+                        lng: Number(elmnt.target.dataset.lng)
+                    })});
+                }
+            });
+
+            mylocationbtn.addEventListener("click", _ => { getLocation(); });
+
+            function getLocation() {
+                navigator.geolocation ? navigator.geolocation.getCurrentPosition(showPosition) : mygeolocation.innerHTML = "Geolocation is not supported by this browser.";
+            }
+
+            function showPosition(position) {
+                let location = {lat: position.coords.latitude, lng: position.coords.longitude};
+
+                mygeolocation.innerHTML = `Latitude: ${location.lat} Longitude: ${location.lng}`;
+                setPosition(location);
+            }
+            
+            function initMap(location = {lat: -25.363, lng: 131.044}) {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 17,
+                    center: location
+                });
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+
+            function setPosition(position) {
+                map.setCenter(position);
+                marker.setPosition(position);
+            }
+        </script>
+    </body>
+</html>
